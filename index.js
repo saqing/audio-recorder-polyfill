@@ -1,10 +1,15 @@
 var AudioContext = window.AudioContext || window.webkitAudioContext
 
-function createWorker (fn) {
+function createWorker (fn,arr) {
   var js = fn
     .toString()
     .replace(/^function\s*\(\)\s*{/, '')
     .replace(/}$/, '')
+
+  if(arr.length>0){
+    const content = arr.map((item)=>`'${item}'`).join(',')
+    js=`importScripts(${content})\n${js}`
+  } 
   var blob = new Blob([js])
   return new Worker(URL.createObjectURL(blob))
 }
@@ -43,7 +48,7 @@ function MediaRecorder (stream) {
   this.state = 'inactive'
 
   this.em = document.createDocumentFragment()
-  this.encoder = createWorker(MediaRecorder.encoder)
+  this.encoder = createWorker(MediaRecorder.encoder, MediaRecorder.externalScripts)
 
   var recorder = this
   this.encoder.addEventListener('message', function (e) {
