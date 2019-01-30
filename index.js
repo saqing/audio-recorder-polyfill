@@ -46,6 +46,7 @@ function MediaRecorder (stream) {
     event.data = new Blob(e.data, { type: recorder.mimeType })
     recorder.em.dispatchEvent(event)
     if (recorder.state === 'inactive') {
+      recorder.encoder && recorder.encoder.terminate()
       recorder.em.dispatchEvent(new Event('stop'))
     }
   })
